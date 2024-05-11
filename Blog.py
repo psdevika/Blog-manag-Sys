@@ -188,9 +188,9 @@ def create():
     for ab in data7 :
         table.add_row(ab)
         print(table)
-        print("Blog created successfully")
+        print("Blog created successfully!!!")
         break
-        homepage()
+        menu()
     
     mydb.commit()
     crs.close
@@ -208,7 +208,7 @@ def read():
     if category=='MATHS' :
         #crs.execute("SELECT post_id,username,question FROM qns WHERE Categories='MATHS'")
         #crs.execute("SELECT id, username, question FROM qns WHERE Categories='MATHS'")
-        crs.execute("SELECT id, user_name, question FROM qns WHERE Categories='MATHS'")
+        crs.execute("SELECT post_id, user_name, question FROM qns WHERE Categories='MATHS'")
         data12=crs.fetchall()
         table=PrettyTable()
         table.field_names=["post_id","user_name","question"]
@@ -253,7 +253,7 @@ def read():
             print(table)
             break
     else :
-        print("invalid")
+        print("     XX INVALID CHOICE XX ")
    
     qry10 = "SELECT question, comment FROM comments"
     crs.execute(qry10)
@@ -266,8 +266,8 @@ def read():
 
     choice2=input("DO YOU WANT TO COMMENT THE POST(y/n) : ")
     if choice2== 'y' :
-        post_id=int(input("ENTER the post id :"))
-        crs.execute('SELECT post_id,question FROM qns WHERE post_id=(%s)',(post_id,))
+        post_id=int(input("ENTER the post id : "))
+        crs.execute('SELECT post_id,question WHERE post_id=(%s)',(post_id,))
         data17=crs.fetchall()
         table=PrettyTable()
         table.field_names=["post_id","question"]
@@ -277,7 +277,7 @@ def read():
             break
         cmt=input("Enter your comment here : ")
         crs.execute('insert into comments(comment) values(%s) ',(cmt, ))
-        crs.execute('UPDATE comments SET comment=comment+1 where post_id=(%s)',(post_id, ))
+        crs.execute('UPDATE comments SET comment=comment+1 FROM qns where post_id=(%s)',(post_id, ))
     crs.close()
     mydb.commit()
 
@@ -290,22 +290,23 @@ def profile():
     crs.execute(qry02)
     print("profile")
     a1=input("Enter your Username: ")
-    crs.execute('select id_profile,Username,Followers,Following,Owned_Posts from Profiles where Username=(%s) ',(a1, ))
+    crs.execute('SELECT id_profile,Username,Followers,Following,Owned_Posts FROM Profiles WHERE Username=(%s) ',(a1, ))
     data=crs.fetchall()
     table=PrettyTable()
     table.field_names=["id_profile","Username","Followers","Following","Owned_Posts"]
     for ab in data :
         table.add_row(ab)
         print(table)
-        homepage()
+        break
     print("YOU CAN REMOVE YOUR ACCOUNT OR POSTS HERE")
     del_pfl=input("TO REMOVE ACCOUNT ENTER (a) \n TO REMOVE POST ENTER (p) : ")
     if del_pfl== 'a':
-        username=input("Enter your user name")
-        crs.execute('DELETE FROM Profiles WHERE Username=(%s)',(username))
+        username7=input("Enter your Username: ")
+        crs.execute('DELETE FROM Profiles WHERE Username=(%s)',(username7, ))
+        crs.execute('UPDATE comments SET Username=Username-1 FROM Profiles where Username=(%s)',(username7, ))
         print("ACCOUNT DELETED SUCCESSFULLY")
     elif del_pfl== 'p':
-        username1=input("Enter your user name") 
+        username1=input("Enter your Username: ") 
         crs.execute('select post_id,question from qns where user_name=(%s)',(username1, ))
         data18=crs.fetchall()
         table=PrettyTable()
@@ -324,62 +325,8 @@ def profile():
     mydb.commit()
     crs.close()
 
-
-
-def user():
-    from prettytable import PrettyTable
-    mydb = msc.connect(host="localhost",user="root",password="root",allow_local_infile=True)
-    crs=mydb.cursor()
-    qry02 = "USE bms"
-    crs.execute(qry02)
-    print("USER PANEL")
-    u1=int(input("select (1) If You  do not have an account here\n select (2) If you have an account to continue"))
-    if u1== 1 :
-        print("Create account")
-        Username4=input("Enter your new username: ")
-        email=input("enter your email: ")
-        Followers=0
-        Following=0
-        Owned_Posts=0
-        crs.execute('insert into qns(user_name) values(%s) ',(Username4, ))
-        crs.execute('insert into Profiles(Username,Email,Followers,Following,Owned_Posts) values(%s,%s,%s,%s,%s)',(Username4,email, Followers, Following,Owned_Posts))
-        crs.execute('select id_profile,Username,Followers,Following,Owned_Posts from Profiles where Username=(%s) ',( Username4, ))
-        data3=crs.fetchall()
-        table=PrettyTable()
-        table.field_names=["id_profile","Username","Followers","Following","Owned_Posts"]
-        for ab in data3 :
-            table.add_row(ab)
-            print(table)
-            break
-        mydb.commit()
-        crs.close()
-        print("CREATED ACCOUNT SUCCESSFULLY")
-        print()
-        print()
-        print("""                                                       MAIN MENU          
-                                                             +--------------------------------+
-                                                             |           a.Create a post      |
-                                                             +--------------------------------+         
-                                                             +--------------------------------+
-                                                             |           b.Read               |
-                                                             +--------------------------------+                                         
-                                                             +--------------------------------+
-                                                             |           c.Profile            |
-                                                             +--------------------------------+ 
-                                                                                                """)
-                                                                    
-        a6=input("Enter your choice : ")       
-        if a6 == 'a':
-            create()
-        elif a6 == 'b':
-            read()
-        elif a6 == 'c' :
-            profile()
-        else:
-            print(" Enter valid choice ")
-    
-    elif u1== 2 :
-         print(                          """                           c MAIN MENU
+def menu():
+         print(                          """            ===============  MAIN MENU  ===============
                                                              +--------------------------------+
                                                              |           a.Create a post      |
                                                              +--------------------------------+         
@@ -389,6 +336,9 @@ def user():
                                                              +--------------------------------+
                                                              |           c.Profile            |
                                                              +--------------------------------+  
+                                                             +--------------------------------+
+                                                             |           d.Exit               |
+                                                             +--------------------------------+ 
                                                                                                               """)
          a5=input("Enter your choice : ")
          if a5 == 'a':
@@ -397,10 +347,97 @@ def user():
              read()
          elif a5 == 'c' :
              profile()
+         elif a5 == 'd' :
+             exit()
          else:
-             print(" Enter valid choice ")
+             print("     XX INVALID CHOICE XX")
+
+
+
+
+def user():
+    from prettytable import PrettyTable
+    mydb = msc.connect(host="localhost",user="root",password="root",allow_local_infile=True)
+    crs=mydb.cursor()
+    qry02 = "USE bms"
+    crs.execute(qry02)
+    print("USER PANEL")
+    u1=int(input("select (1) If You  do not have an account here\n select (2) If you have an account to continue  : "))
+    if u1== 1 :
+        print("Create account")
+        Username4=input("Enter your new Username: ")
+        email=input("enter your email: ")
+        Followers=0
+        Following=0
+        Owned_Posts=0
+        crs.execute('insert into qns(user_name) values(%s) ',(Username4, ))
+        crs.execute('insert into Profiles(Username,Email,Followers,Following,Owned_Posts) values(%s,%s,%s,%s,%s)',(Username4,email, Followers, Following,Owned_Posts))
+        crs.execute('select id_profile,Username,Followers,Following,Owned_Posts from Profiles where Username=(%s) ',( Username4, ))
+        crs.execute('UPDATE comments SET Username=Username+1 FROM Profiles where Username=(%s)',(Username4, ))
+        data3=crs.fetchall()
+        table=PrettyTable()
+        table.field_names=["id_profile","Username","Followers","Following","Owned_Posts"]
+        for ab in data3 :
+            table.add_row(ab)
+            print(table)
+            break
+        mydb.commit()
+        crs.close()
+        print("CREATED ACCOUNT SUCCESSFULLY!!!")
+        print()
+        menu()
+        print()
+    elif u1 == 2 :
+        menu()
+        # print()
+        # print("""                                                       MAIN MENU          
+        #                                                      +--------------------------------+
+        #                                                      |           a.Create a post      |
+        #                                                      +--------------------------------+         
+        #                                                      +--------------------------------+
+        #                                                      |           b.Read               |
+        #                                                      +--------------------------------+                                         
+        #                                                      +--------------------------------+
+        #                                                      |           c.Profile            |
+        #                                                      +--------------------------------+ 
+        #                                                                                         """)
+                                                                    
+        # a6=input("Enter your choice : ")       
+        # if a6 == 'a':
+        #     create()
+        # elif a6 == 'b':
+        #     read()
+        # elif a6 == 'c' :
+        #     profile()
+        # else:
+        #     print(" Enter valid choice ")
+    
+    # elif u1== 2 :
+    #      print(                          """                           c MAIN MENU
+    #                                                          +--------------------------------+
+    #                                                          |           a.Create a post      |
+    #                                                          +--------------------------------+         
+    #                                                          +--------------------------------+
+    #                                                          |           b.Read               |
+    #                                                          +--------------------------------+                                         
+    #                                                          +--------------------------------+
+    #                                                          |           c.Profile            |
+    #                                                          +--------------------------------+  
+    #                                                                                                           """)
+    #      a5=input("Enter your choice : ")
+    #      if a5 == 'a':
+    #          create()
+    #      elif a5 == 'b':
+    #          read()
+    #      elif a5 == 'c' :
+    #          profile()
+    #      else:
+    #          print(" Enter valid choice ")
     else:
-         print(" Enter valid choice ")
+         print("     XX INVALID CHOICE XX")
+
+
+
 
 def profilemng():
     import mysql.connector as msc
@@ -410,7 +447,8 @@ def profilemng():
     qry02 = "USE bms"
     crs.execute(qry02)
     print(" To manage profile")
-    print("___________________")
+    print("-------------------")
+    print()
     qry06 = "SELECT * FROM Profiles"
     crs.execute(qry06)
     rows = crs.fetchall()
@@ -419,7 +457,7 @@ def profilemng():
     for rows in rows:
         table.add_row(rows)
     print(table)
-    username2=input("enter username")
+    username2=input("Enter Username: ")
     crs.execute('select question from qns where user_name=(%s)', (username2, ))
     data7=crs.fetchall()
     table=PrettyTable()
@@ -427,15 +465,15 @@ def profilemng():
     for ab in data7 :
         table.add_row(ab)
         print(table)
-    cd=input("wanna delete profile(y) or go to dashboard (n) :")
+    cd=input("Wanna DELETE profile(y) or go to dashboard (n) : ")
     if cd== 'y' :
-        username3=input("Enter your user name")
+        username3=input("Enter your user name : ")
         crs.execute('DELETE FROM Profiles WHERE Username=(%s)',(username3))
-        print("ACCOUNT DELETED SUCCESSFULLY")
+        print("ACCOUNT DELETED SUCCESSFULLY!!!")
     elif cd== 'n':
         dashboard()
     else :
-        print("fgg")
+        print("     XX  INVALID CHOICE  XX")
     crs.close()
     mydb.commit()
     
@@ -495,14 +533,16 @@ def categorymng():
             print(table)
             break
     else :
-        print("invalid")
+        print("     XX INVALID CHOICE XX")
     crs.close()
     mydb.commit()
 
     
 def exit():
     print("                                                            THANK YOU FOR VISITING")
-    print("                                                                    ƪ(˘⌣˘)ʃ　   ")
+    print("                                                                    ƪ(˘⌣˘)ʃ   ")
+    print()
+    print()
     
     print("                                                           ***BLOG MANAGEMENT SYSTEM***")
     print("                                                             BY")
@@ -510,14 +550,22 @@ def exit():
     print("                                                             DRISYA C C")
     print("                                                             RINIT ROLLY")
     print("                                                             CHRISTEENA FRANCIS\n ")
+    a1 =input("Do you want to go to Homepage(y/n): ")
+    if a1 == 'y':
+        homepage()
+    elif a1 == 'n':
+        exit()
+    else:
+        print("     XX INVALID CHOICE XX")
+    
 
 
 def dashboard():
     print("                                                                ADMIN PANEL")
-    print(      "                                  ____________________________________________________________")
-    print("DASHBOARD")
-    print("\n\n")
-    print(" what you wanted to manage ")
+    print(      "                                            =========================================")
+    print()
+    print("\n")
+    print(" WHAT YOU WANTED TO MANAGE ? ")
     print(""" 
                                                       
                                                                  +--------------------------------+
@@ -531,35 +579,38 @@ def dashboard():
                                                                  +--------------------------------+  
                                                                                                               """)
 
-    a4 = int(input("Enter your choice :"))
+    a4 = int(input("Enter your choice : "))
     if a4 == 1:
         profilemng()
     elif a4 == 2:
         categorymng()
     elif a4 == 3:
-        print("GO TO EXIT")
+        print("EXIT")
         exit()
     else:
-       print("      XX   INVALID CHOICE   XX")
+       print("     XX   INVALID CHOICE   XX")
 
 
 def admin():
-    print("Enter the password to log in to the ADMIN PANEL \n (Remember you have only 3 chances to login ) ")
+    print("Enter the password to log in to the ADMIN PANEL \n (Remember you have only 3 chances to login )")
     num=1
     while num <= 3:
-        a2 = int(input("Enter the password here :"))
+        a2 = int(input("Enter the password here : "))
         if a2 == 1234:
             dashboard()
         else :
-            print("password is incorrect")
+            print("PASSWORD IS INCORREST!!!")
         num = num + 1
-        print(" you have no more chances")
+        print(" !!!YOU HAVE NO MORE CHANCES !!!")
+        homepage()
 
 def homepage():
 
-    print("                              Enter 1 for logging into Admin panel || Enter 2 for log in as a user")
+    print()
+    print()
+    print("                                   Enter 1 for logging into Admin panel ||   Enter 2 for log in as a user")
     print(""" 
-            
+                                                     ===============  HOMEPAGE  ===============
                                                          +--------------------------------+
                                                          |           1.Admin Panel        |
                                                          +--------------------------------+         
@@ -567,7 +618,7 @@ def homepage():
                                                          |           2.User               |
                                                          +--------------------------------+                                           """)
 
-    a1 = int(input("Enter your choice :"))
+    a1 = int(input("Enter your choice : "))
     if a1 == 1:
         print("Admin panel")
         admin()
@@ -575,10 +626,12 @@ def homepage():
         print("User")
         user()
     else:
-        print("please enter valid choice")
+        print("please enter valid choice: ")
 
 while True:
+   print("____________________________________________________________________________________________________________________________________________________________")
+   print()
    print("                                                                 BLOG MANAGEMENT SYSTEM")
-   print("_____________________________________________________________________________________________________________________________________________________________________________")
+   print("                                                    ____________________________________________________")
    homepage()
    break
