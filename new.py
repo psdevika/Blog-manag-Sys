@@ -603,19 +603,6 @@ def dashboard():
     else:
        print("     XX   INVALID CHOICE   XX")
 
-
-def admin():
-    print("Enter the password to log in to the ADMIN PANEL \n (Remember you have only 3 chances to login ) ")
-    num=1
-    while num <= 3:
-        a2 = int(input("Enter the password here :"))
-        if a2 == 1234:
-            dashboard()
-        else :
-            print("password is incorrect!!")
-        num = num + 1
-        print(" !!!you have no more chances!!!")
-
 def admin():
     print("Enter the password to log in to the ADMIN PANEL \n (Remember you have only 3 chances to login ) ")
     num = 1
@@ -623,11 +610,11 @@ def admin():
         a2 = int(input("Enter the password here: "))
         if a2 == 1234:
             dashboard()
-            return  # Exit the function if the password is correct
         else:
             print("Password is incorrect!!")
             if num == 3:  # Check if it's the last attempt
                 print("!!! You have no more chances !!!")
+                homepage()
         num = num + 1
 
 
